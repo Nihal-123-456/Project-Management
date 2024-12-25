@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block body %}
+<div class="container dashboard-navigation list-unstyled mx-5">
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <span class="material-symbols-outlined bg-white p-2" style="border-radius: 50%;">note_alt</span>
+        <h5 class="text-white">Project Tracker</h5>
+    </div>
+    <div class="text-white">
+        <a href="#dashboard-section-heading" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">home</span>Project Overview</li></a>
+        <a href="#project-lists" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">apps</span>All Projects</li></a>
+        <a href="#completed-project-lists" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">done_all</span>Completed Projects</li></a>
+        <a href="#ongoing-project-lists" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">resume</span>Ongoing Projects</li></a>
+        <a href="#upcoming-project-lists" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">upcoming</span>Upcoming Deadlines</li></a>
+        <a href="#overdue-project-lists" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">warning</span>Overdue Projects</li></a>
+        <a href="{% url 'create_project' %}" class="text-white text-decoration-none"><li class="d-flex align-items-center gap-2"><span class="material-symbols-outlined">add_circle</span>Create Project</li></a>
+    </div>
+</div>
+
+<div class="container dashboard-container me-5">
+    <h2 class="text-center mb-5" id="dashboard-section-heading">Welcome to Your Dashboard</h2>
+    
+    <div id="dashboard-section" class="d-lg-flex justify-content-lg-center flex-lg-wrap gap-lg-3 stats">
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3" href="#project-lists">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-info-subtle">fact_check</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Total Projects</h6>
+                    <p class="fs-4" id="total-project-count">{{projects.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3" href="#completed-project-lists">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-success-subtle">checklist</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Completed Projects</h6>
+                    <p class="fs-4" id="completed-project-count">{{completed_projects.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3" href="#ongoing-project-lists">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-primary-subtle">description</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Ongoing Projects</h6>
+                    <p class="fs-4" id="ongoing-project-count">{{ongoing_projects.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3" href="#upcoming-project-lists">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-warning-subtle">notification_important</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Upcoming Deadlines</h6>
+                    <p class="fs-4">{{upcoming_projects.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3" href="#overdue-project-lists">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-danger-subtle">gpp_maybe</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Overdue Projects</h6>
+                    <p class="fs-4">{{overdue_projects.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-3 pb-lg-0">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3 mt-3" href="{% url 'create_project' %}">
+                <span style="border-radius: 50%;" class="material-symbols-outlined p-2 bg-info text-white">add</span>
+                <h6 class="mb-1">Add Project</h6>
+            </a>
+        </div>
+    </div>
+    
+    <div class="project-list-container" id="project-lists">
+        <h2 class="mb-4">All Projects</h2>
+        <hr>
+        {% if projects %}
+        <div class="mt-5 d-lg-flex flex-lg-wrap gap-lg-5">
+            {% for pro in projects %}
+            <div class="project-info-card ">
+                <h5>{{pro.title}}</h5>
+                <div class="d-flex justify-content-between mt-4 mb-3 align-items-baseline">
+                    <p title="Total time spent">
+                    <small class="d-flex gap-1 align-items-center">
+                        <span class="material-symbols-outlined">timer</span>
+                        <span id="{{task.id}}-time-spent">{{pro.time_spent|format_duration}}</span>
+                    </small></p>
+                    <div class="d-flex project-actions pb-0 px-2">
+                        {% if pro.status == 'in_progress' %}
+                            <div style="cursor: pointer; color: rgb(1, 183, 1); border-right: 1px solid gray;" title="Mark as complete">
+                                <span class="material-symbols-outlined px-1 mt-1" onclick="complete_project(event, '{{pro.id}}')" id="complete-project-btn-{{pro.id}}">
+                                    check_small
+                                </span>
+                            </div>
+                        {% endif %}
+                        <span class="material-symbols-outlined px-1 mt-1 mb-1" style="cursor: pointer; color: red;" title="delete project" onclick="delete_project(event, '{{pro.id}}')">
+                        delete</span>
+                        {% if pro.status != 'completed' %}
+                        <a href="{% url 'edit_project' pro.id %}" style="cursor: pointer; color: rgb(40, 40, 255); border-left: 1px solid gray;"><span class="material-symbols-outlined px-1 mt-1" title="edit project">
+                        edit</span></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between gap-5 project-info-status mb-4">
+                    {% if pro.status == 'completed' %}
+                        <div class="d-flex gap-1 align-items-center bg-success-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% elif pro.status == 'overdue' %}
+                        <div class="d-flex gap-1 align-items-center bg-danger-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">report</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-1 align-items-center bg-primary-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">article</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex gap-1 align-items-center bg-info-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                        <span class="material-symbols-outlined fw-bold">schedule</span>
+                        <small>{{pro.deadline}}</small>
+                    </div>
+                </div>
+                {% if pro.status == 'overdue' %}
+                <div class="d-flex gap-1" style="color: red; opacity: 0.55;">
+                    <span class="material-symbols-outlined fw-bold">
+                        error
+                    </span>
+                    <small class="fw-bold">This project is overdue. Change the project deadline to enable the completion button.</small>
+                </div>
+                {% endif %}
+                <hr class="mb-4">
+                <a class="text-decoration-none text-black bg-warning bg-opacity-50 p-2 px-3 fw-bold" style="border-radius: 20px;" href="{% url 'project_detail' pro.id %}">See Details</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No projects available.</p>
+        {% endif %}
+    </div>
+
+    <div class="project-list-container" id="ongoing-project-lists">
+        <h2 class="mb-4">Ongoing Projects</h2>
+        <hr>
+        {% if ongoing_projects %}
+        <div class="mt-5 d-lg-flex flex-lg-wrap gap-lg-5">
+            {% for pro in ongoing_projects %}
+            <div class="project-info-card ">
+                <h5>{{pro.title}}</h5>
+                <div class="d-flex justify-content-between mt-4 mb-3 align-items-baseline">
+                    <p title="Total time spent">
+                    <small class="d-flex gap-1 align-items-center">
+                        <span class="material-symbols-outlined">timer</span>
+                        <span id="{{task.id}}-time-spent">{{pro.time_spent|format_duration}}</span>
+                    </small></p>
+                    <div class="d-flex project-actions pb-0 px-2">
+                        {% if pro.status == 'in_progress' %}
+                            <div style="cursor: pointer; color: rgb(1, 183, 1); border-right: 1px solid gray;" title="Mark as complete">
+                                <span class="material-symbols-outlined px-1 mt-1" onclick="complete_project(event, '{{pro.id}}')" id="complete-project-btn-{{pro.id}}">
+                                    check_small
+                                </span>
+                            </div>
+                        {% endif %}
+                        <span class="material-symbols-outlined px-1 mt-1 mb-1" style="cursor: pointer; color: red;" title="delete project" onclick="delete_project(event, '{{pro.id}}')">
+                        delete</span>
+                        {% if pro.status != 'completed' %}
+                        <a href="{% url 'edit_project' pro.id %}" style="cursor: pointer; color: rgb(40, 40, 255); border-left: 1px solid gray;"><span class="material-symbols-outlined px-1 mt-1" title="edit project">
+                        edit</span></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between gap-5 project-info-status mb-4">
+                    {% if pro.status == 'completed' %}
+                        <div class="d-flex gap-1 align-items-center bg-success-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% elif pro.status == 'overdue' %}
+                        <div class="d-flex gap-1 align-items-center bg-danger-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">report</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-1 align-items-center bg-primary-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">article</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex gap-1 align-items-center bg-info-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                        <span class="material-symbols-outlined fw-bold">schedule</span>
+                        <small>{{pro.deadline}}</small>
+                    </div>
+                </div>
+                {% if pro.status == 'overdue' %}
+                <div class="d-flex gap-1" style="color: red; opacity: 0.55;">
+                    <span class="material-symbols-outlined fw-bold">
+                        error
+                    </span>
+                    <small class="fw-bold">This project is overdue. Change the project deadline to enable the completion button.</small>
+                </div>
+                {% endif %}
+                <hr class="mb-4">
+                <a class="text-decoration-none text-black bg-warning bg-opacity-50 p-2 px-3 fw-bold" style="border-radius: 20px;" href="{% url 'project_detail' pro.id %}">See Details</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No projects available.</p>
+        {% endif %}
+    </div>
+
+    <div class="project-list-container" id="upcoming-project-lists">
+        <h2 class="mb-4">Upcoming Projects</h2>
+        <hr>
+        {% if upcoming_projects %}
+        <div class="mt-5 d-lg-flex flex-lg-wrap gap-lg-5">
+            {% for pro in upcoming_projects %}
+            <div class="project-info-card ">
+                <h5>{{pro.title}}</h5>
+                <div class="d-flex justify-content-between mt-4 mb-3 align-items-baseline">
+                    <p title="Total time spent">
+                    <small class="d-flex gap-1 align-items-center">
+                        <span class="material-symbols-outlined">timer</span>
+                        <span id="{{task.id}}-time-spent">{{pro.time_spent|format_duration}}</span>
+                    </small></p>
+                    <div class="d-flex project-actions pb-0 px-2">
+                        {% if pro.status == 'in_progress' %}
+                            <div style="cursor: pointer; color: rgb(1, 183, 1); border-right: 1px solid gray;" title="Mark as complete">
+                                <span class="material-symbols-outlined px-1 mt-1" onclick="complete_project(event, '{{pro.id}}')" id="complete-project-btn-{{pro.id}}">
+                                    check_small
+                                </span>
+                            </div>
+                        {% endif %}
+                        <span class="material-symbols-outlined px-1 mt-1 mb-1" style="cursor: pointer; color: red;" title="delete project" onclick="delete_project(event, '{{pro.id}}')">
+                        delete</span>
+                        {% if pro.status != 'completed' %}
+                        <a href="{% url 'edit_project' pro.id %}" style="cursor: pointer; color: rgb(40, 40, 255); border-left: 1px solid gray;"><span class="material-symbols-outlined px-1 mt-1" title="edit project">
+                        edit</span></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between gap-5 project-info-status mb-4">
+                    {% if pro.status == 'completed' %}
+                        <div class="d-flex gap-1 align-items-center bg-success-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% elif pro.status == 'overdue' %}
+                        <div class="d-flex gap-1 align-items-center bg-danger-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">report</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-1 align-items-center bg-primary-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">article</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex gap-1 align-items-center bg-info-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                        <span class="material-symbols-outlined fw-bold">schedule</span>
+                        <small>{{pro.deadline}}</small>
+                    </div>
+                </div>
+                {% if pro.status == 'overdue' %}
+                <div class="d-flex gap-1" style="color: red; opacity: 0.55;">
+                    <span class="material-symbols-outlined fw-bold">
+                        error
+                    </span>
+                    <small class="fw-bold">This project is overdue. Change the project deadline to enable the completion button.</small>
+                </div>
+                {% endif %}
+                <hr class="mb-4">
+                <a class="text-decoration-none text-black bg-warning bg-opacity-50 p-2 px-3 fw-bold" style="border-radius: 20px;" href="{% url 'project_detail' pro.id %}">See Details</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No projects available.</p>
+        {% endif %}
+    </div>
+
+    <div class="project-list-container" id="overdue-project-lists">
+        <h2 class="mb-4">Overdue Projects</h2>
+        <hr>
+        {% if overdue_projects %}
+        <div class="mt-5 d-lg-flex flex-lg-wrap gap-lg-5">
+            {% for pro in overdue_projects %}
+            <div class="project-info-card ">
+                <h5>{{pro.title}}</h5>
+                <div class="d-flex justify-content-between mt-4 mb-3 align-items-baseline">
+                    <p title="Total time spent">
+                    <small class="d-flex gap-1 align-items-center">
+                        <span class="material-symbols-outlined">timer</span>
+                        <span id="{{task.id}}-time-spent">{{pro.time_spent|format_duration}}</span>
+                    </small></p>
+                    <div class="d-flex project-actions pb-0 px-2">
+                        {% if pro.status == 'in_progress' %}
+                            <div style="cursor: pointer; color: rgb(1, 183, 1); border-right: 1px solid gray;" title="Mark as complete">
+                                <span class="material-symbols-outlined px-1 mt-1" onclick="complete_project(event, '{{pro.id}}')" id="complete-project-btn-{{pro.id}}">
+                                    check_small
+                                </span>
+                            </div>
+                        {% endif %}
+                        <span class="material-symbols-outlined px-1 mt-1 mb-1" style="cursor: pointer; color: red;" title="delete project" onclick="delete_project(event, '{{pro.id}}')">
+                        delete</span>
+                        {% if pro.status != 'completed' %}
+                        <a href="{% url 'edit_project' pro.id %}" style="cursor: pointer; color: rgb(40, 40, 255); border-left: 1px solid gray;"><span class="material-symbols-outlined px-1 mt-1" title="edit project">
+                        edit</span></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between gap-5 project-info-status mb-4">
+                    {% if pro.status == 'completed' %}
+                        <div class="d-flex gap-1 align-items-center bg-success-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% elif pro.status == 'overdue' %}
+                        <div class="d-flex gap-1 align-items-center bg-danger-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">report</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-1 align-items-center bg-primary-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">article</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex gap-1 align-items-center bg-info-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                        <span class="material-symbols-outlined fw-bold">schedule</span>
+                        <small>{{pro.deadline}}</small>
+                    </div>
+                </div>
+                {% if pro.status == 'overdue' %}
+                <div class="d-flex gap-1" style="color: red; opacity: 0.55;">
+                    <span class="material-symbols-outlined fw-bold">
+                        error
+                    </span>
+                    <small class="fw-bold">This project is overdue. Change the project deadline to enable the completion button.</small>
+                </div>
+                {% endif %}
+                <hr class="mb-4">
+                <a class="text-decoration-none text-black bg-warning bg-opacity-50 p-2 px-3 fw-bold" style="border-radius: 20px;" href="{% url 'project_detail' pro.id %}">See Details</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No projects available.</p>
+        {% endif %}
+    </div>
+
+    <div class="project-list-container" id="completed-project-lists">
+        <h2 class="mb-4">Completed Projects</h2>
+        <hr>
+        {% if completed_projects %}
+        <div class="mt-5 d-lg-flex flex-lg-wrap gap-lg-5">
+            {% for pro in completed_projects %}
+            <div class="project-info-card ">
+                <h5>{{pro.title}}</h5>
+                <div class="d-flex justify-content-between mt-4 mb-3 align-items-baseline">
+                    <p title="Total time spent">
+                    <small class="d-flex gap-1 align-items-center">
+                        <span class="material-symbols-outlined">timer</span>
+                        <span id="{{task.id}}-time-spent">{{pro.time_spent|format_duration}}</span>
+                    </small></p>
+                    <div class="d-flex project-actions pb-0 px-2">
+                        {% if pro.status == 'in_progress' %}
+                            <div style="cursor: pointer; color: rgb(1, 183, 1); border-right: 1px solid gray;" title="Mark as complete">
+                                <span class="material-symbols-outlined px-1 mt-1" onclick="complete_project(event, '{{pro.id}}')" id="complete-project-btn-{{pro.id}}">
+                                    check_small
+                                </span>
+                            </div>
+                        {% endif %}
+                        <span class="material-symbols-outlined px-1 mt-1 mb-1" style="cursor: pointer; color: red;" title="delete project" onclick="delete_project(event, '{{pro.id}}')">
+                        delete</span>
+                        {% if pro.status != 'completed' %}
+                        <a href="{% url 'edit_project' pro.id %}" style="cursor: pointer; color: rgb(40, 40, 255); border-left: 1px solid gray;"><span class="material-symbols-outlined px-1 mt-1" title="edit project">
+                        edit</span></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between gap-5 project-info-status mb-4">
+                    {% if pro.status == 'completed' %}
+                        <div class="d-flex gap-1 align-items-center bg-success-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% elif pro.status == 'overdue' %}
+                        <div class="d-flex gap-1 align-items-center bg-danger-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">report</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% else %}
+                        <div class="d-flex gap-1 align-items-center bg-primary-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                            <span class="material-symbols-outlined">article</span>
+                            <small class="fw-bold">{{pro.formatted_status}}</small>
+                        </div>
+                    {% endif %}
+                    <div class="d-flex gap-1 align-items-center bg-info-subtle pt-1 pb-1 px-2" style="border-radius: 20px;">
+                        <span class="material-symbols-outlined fw-bold">schedule</span>
+                        <small>{{pro.deadline}}</small>
+                    </div>
+                </div>
+                {% if pro.status == 'overdue' %}
+                <div class="d-flex gap-1" style="color: red; opacity: 0.55;">
+                    <span class="material-symbols-outlined fw-bold">
+                        error
+                    </span>
+                    <small class="fw-bold">This project is overdue. Change the project deadline to enable the completion button.</small>
+                </div>
+                {% endif %}
+                <hr class="mb-4">
+                <a class="text-decoration-none text-black bg-warning bg-opacity-50 p-2 px-3 fw-bold" style="border-radius: 20px;" href="{% url 'project_detail' pro.id %}">See Details</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No projects available.</p>
+        {% endif %}
+    </div>
+</div>
+{% block footer %}
+{% endblock %}
+<footer class="d-lg-none" id="footer">
+    <!-- Footer for small screen starts -->
+    <div class="accordion accordion-flush" id="accordionFooter">
+      <div class="accordion-item">
+        <h4 class="fw-bold text-center p-3">
+            Project Tracker
+        </h4>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            <small class="fw-bold">Resource</small>
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFooter">
+          <div class="accordion-body">
+            <p><small>Blog <br> Guide <br> Help center <br> Stories</small></p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            <small class="fw-bold">Info</small>
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFooter">
+          <div class="accordion-body">
+            <p><small>Customer Service <br> Shipping & Delivery <br> Exchange Rate <br> Care Guide <br> Terms of Service</small></p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            <small class="fw-bold">Follow us</small>
+          </button>
+        </h2>
+        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionFooter">
+          <div class="accordion-body">
+            <p><small>Instagram <br> Facebook <br> Pinterest <br> Tiktok</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div>
+      <p class="fw-bold" style="color: rgb(111, 111, 111);"><small>&copy; 2024 Project Tracker | All Rights Reserved</small></p>
+    </div>
+    <!-- Footer for small screen ends -->
+</footer>
+{% endblock %}

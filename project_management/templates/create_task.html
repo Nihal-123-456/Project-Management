@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="login-container d-lg-flex gap-lg-5 align-items-lg-center">
+    <div id="edit-task-img"><img class="w-100" src="https://cdn.pixabay.com/photo/2016/03/31/19/50/checklist-1295319_1280.png" alt=""></div>
+
+    <div id="edit-task-form">
+        <h3>Add a New Task</h3>
+        <p class="mb-5" style="color: gray; font-weight: 500;">Add tasks to this project by filling out the informations below.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="task_name" class="form-label">Task Name</label>
+                <input type="text" class="form-control" id="task_name" name="task_name" placeholder="Enter task name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="task_due_date" class="form-label">Deadline</label>
+                <input type="date" class="form-control" id="task_due_date" name="task_due_date" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="task_priority" class="form-label">Priority</label>
+                <select class="form-select" id="task_priority" name="task_priority" required>
+                    <option value="" disabled selected>Select priority</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="depends_on" class="form-label">Dependency</label>
+                <select class="form-select" id="depends_on" name="depends_on" required>
+                    <option value="" disabled selected>Select Dependency</option>
+                    <option value="none">None</option>
+                    {% if ongoing_tasks %}
+                    {% for task in ongoing_tasks %}
+                        <option value="{{task.id}}">{{task.title}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-custom-blue mt-4 fw-bold">Create Task</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

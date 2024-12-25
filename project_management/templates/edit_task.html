@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<script>
+    window.onload = function() {
+        task_priority_set('{{ task.priority }}');
+        task_dependency_set('{{ task.depends_on.id }}')
+    };
+    const task_priority_set = (task_priority) => {
+        document.getElementById(`${task_priority}`).selected = true;
+    };
+    const task_dependency_set = (task_dependency) => {
+        if(task_dependency){
+            document.getElementById(`${task_dependency}`).selected = true;
+        }
+        else{
+            document.getElementById('none').selected = true;
+        }
+    };
+</script>
+
+<div class="login-container d-lg-flex gap-lg-5 align-items-lg-center">
+    <div id="edit-task-img"><img class="w-100" src="https://cdn.pixabay.com/photo/2013/03/29/13/38/magnifying-glass-97588_960_720.png" alt=""></div>
+
+    <div id="edit-task-form">
+        <h3>Edit Task</h3>
+        <p class="mb-5" style="color: gray; font-weight: 500;">Edit the task according to your needs.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="edit_task_name" class="form-label">Task Name</label>
+                <input type="text" class="form-control" id="edit_task_name" name="edit_task_name" value="{{task.title}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="edit_task_due_date" class="form-label">Deadline</label>
+                <input type="date" class="form-control" id="edit_task_due_date" name="edit_task_due_date" value="{{task.deadline|date:'Y-m-d'}}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="edit_task_priority" class="form-label">Priority</label>
+                <select class="form-select" id="edit_task_priority" name="edit_task_priority" required>
+                    <option value="low" id="low">Low</option>
+                    <option value="medium" id="medium">Medium</option>
+                    <option value="high" id="high">High</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="edit_depends_on" class="form-label">Dependency</label>
+                <select class="form-select" id="edit_depends_on" name="edit_depends_on" required>
+                    <option value="none" id="none">None</option>
+                    {% if task.depends_on != 'none' and task.depends_on.status == 'overdue' %}
+                        <option value="{{task.depends_on.id}}" id="{{task.depends_on.id}}">{{task.depends_on.title}}</option>
+                    {% endif %}
+                    {% if ongoing_tasks %}
+                    {% for t in ongoing_tasks %}
+                        <option value="{{t.id}}" id="{{t.id}}">{{t.title}}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-custom-blue mt-4 fw-bold">Save changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

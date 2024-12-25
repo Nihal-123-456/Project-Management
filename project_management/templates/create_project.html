@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="login-container d-lg-flex gap-lg-5 align-items-lg-center">
+    <div id="edit-task-img"><img class="w-100" src="https://cdn.pixabay.com/photo/2019/06/24/13/55/idea-4296114_1280.png" alt=""></div>
+
+    <div id="edit-task-form">
+        <h3>Create a New Project</h3>
+        <p class="mb-5" style="color: gray; font-weight: 500;">Create your project by filling out the informations below.</p>
+
+        <form method="post" action="{% url 'create_project' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="projectName" class="form-label">Project Name</label>
+                <input type="text" class="form-control" id="projectName" name="project_name" placeholder="Enter project name" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Project Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Provide a brief description of the project" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="dueDate" class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="dueDate" name="due_date" required>
+            </div>
+            
+            <button type="submit" class="btn btn-custom-blue mt-4 fw-bold">Create Project</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

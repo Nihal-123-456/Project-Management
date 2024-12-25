@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div id="registration-container" class="container d-lg-flex gap-lg-5 align-items-lg-center">
+    <div class="registration-img">
+        <img class="w-100" src="https://cdn.pixabay.com/photo/2016/03/17/06/20/objectives-1262375_1280.jpg" alt="">
+    </div>
+    <div class="registration-form">
+        <h2 class="form-header">User Registration</h2>
+        <p class="mb-5" style="color: gray; font-weight: 500;">Welcome! Please complete your registration by providing the required informations.</p>
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            </div>
+            <button type="submit" class="btn btn-custom-blue w-100 fw-bold mt-4">Register</button>
+        </form>
+        <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}

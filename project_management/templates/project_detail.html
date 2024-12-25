@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block body %}
+<div class="container project-details-section">
+    <div class="d-lg-flex justify-content-lg-center flex-lg-wrap gap-lg-3 stats" id="task-overview-section">
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-info-subtle">fact_check</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Total Tasks</h6>
+                    <p class="fs-4">{{tasks.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-success-subtle">checklist</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Completed Tasks</h6>
+                    <p class="fs-4">{{completed_tasks.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-primary-subtle">description</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Ongoing Tasks</h6>
+                    <p class="fs-4">{{ongoing_tasks.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-1">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3">
+                <span style="border-radius: 10px;" class="material-symbols-outlined p-3 bg-danger-subtle">gpp_maybe</span>
+                <section>
+                    <h6 class="mb-0 mt-2">Overdue Tasks</h6>
+                    <p class="fs-4">{{overdue_tasks.count}}</p>
+                </section>
+            </a>
+        </div>
+        <div class="px-3 pt-2 pb-3">
+            <a class="text-decoration-none text-black d-flex align-items-center gap-3 mt-3" href="{% url 'create_task' project.id %}">
+                <span style="border-radius: 50%;" class="material-symbols-outlined p-2 bg-info text-white">add</span>
+                <h6 class="mb-1">Add Task</h6>
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="project-detail-card card mt-5 mb-5">
+                <div class="card-body">
+                    <h3 class="detail-heading">{{ project.title }}</h3>
+                    <div class="d-flex gap-4 mt-3">
+                        <small class="d-flex align-items-center gap-1 {% if project.status == 'in_progress' %} text-primary {% elif project.status == 'completed' %} text-success {% elif project.status == 'overdue' %} text-danger {% endif %} fw-bold">
+                            {% if project.status == 'in_progress' %}
+                            <span class="material-symbols-outlined fw-bold" style="font-size: 16px;">event_repeat</span>
+                            {% elif project.status == 'completed' %}
+                            <span class="material-symbols-outlined fw-bold" style="font-size: 16px;">check_circle</span>
+                            {% elif project.status == 'overdue' %}
+                            <span class="material-symbols-outlined fw-bold" style="font-size: 16px;">warning</span>
+                            {% endif %}
+                            {{project.formatted_status}}
+                        </small>
+                        <small class="d-flex align-items-center gap-1">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">timer</span>
+                            {{project.deadline}}
+                        </small>
+                    </div>
+                    {% if project.status == 'overdue' %}
+                    <small class="d-flex gap-1 text-danger fw-bold mb-4 mt-3" style="opacity: 0.7;"><span class="material-symbols-outlined">error</span>This project is overdue. You need to extend it's deadline to assign any tasks to it or complete it.</small>
+                    {% endif %}
+                    <hr>
+                    <p>{{ project.description }}</p>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <button class="p-2 fw-bold border-0 px-3 text-white" style="border-radius: 20px; background-color: #E05170;" onclick="delete_project(event, '{{project.id}}')">Delete Project</button>
+                        {% if project.status != 'completed' %}
+                        <a href="{% url 'edit_project' project.id %}" class="p-2 fw-bold border-0 px-3 text-white text-decoration-none bg-primary" style="border-radius: 20px;">Edit Project</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-lg-flex justify-content-between align-items-center">
+                <h2>Task Management</h2>
+                <div class="task-select-btns d-flex gap-0 mt-5 mt-lg-0">
+                    <button class="border-0 p-2 px-3 fw-bold" style="border-radius: 20px 0 0 20px;" id="all-task-btn"><small>All Tasks</small></button>
+                    <button class="border-0 p-2 px-3 fw-bold" id="ongoing-task-btn"><small>Ongoing Tasks</small></button>
+                    <button class="border-0 p-2 px-3 fw-bold" id="completed-task-btn"><small>Completed Tasks</small></button>
+                    <button class="border-0 p-2 px-3 fw-bold" style="border-radius: 0 20px 20px 0;" id="overdue-task-btn"><small>Overdue Tasks</small></button>
+                </div>
+            </div>
+            <hr class="d-none d-lg-block">
+            <div id="task-lists">
+                <div class="mt-5" id="all_tasks">
+                    <div class="task-list-head"><h5>All Tasks</h5></div>
+                    <hr>
+                    {% if tasks %}
+                    <div class="d-lg-flex gap-4 flex-wrap justify-content-center mt-4">
+                        {% for task in tasks %}
+                        <div class="task-info-card {% if not task.is_unlocked and task.status == 'in_progress' %} locked {% endif %}">
+                            <p class="p-1 px-2 rounded fw-bold">{{task.title}}</p>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                {% if task.priority == 'high' %}
+                                <p><small class="bg-danger text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'medium' %}
+                                <p><small class="bg-warning text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'low' %}
+                                <p><small class="bg-success text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% endif %}
+                                <p>
+                                <small class="d-flex gap-1 align-items-center">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    <span id="time-spent-{{task.id}}">{{task.time_spent|format_duration}}</span>
+                                </small></p>
+                            </div>
+                            <div class="project-info-status d-flex align-items-center justify-content-between gap-5">
+                                <div class="d-flex gap-1 align-items-center {% if task.status == 'in_progress' %}text-primary{% elif task.status == 'overdue' %}text-danger{% elif task.status == 'completed' %}text-success{% endif %}" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined">
+                                        {% if task.status == 'in_progress' %}
+                                            sync
+                                        {% elif task.status == 'overdue' %}
+                                            report
+                                        {% elif task.status == 'completed' %}
+                                            check_circle
+                                        {% endif %}
+                                    </span>
+                                    <small class="fw-bold">{{task.formatted_task_status}}</small>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined fw-bold">schedule</span>
+                                    <small>{{task.deadline}}</small>
+                                </div>
+                            </div>
+                            {% if task.status == 'in_progress' and task.depends_on %}
+                                {% if not task.is_unlocked %}
+                                <div class="mt-2">
+                                    <small class="warning d-flex gap-1 text-danger opacity-75 fw-bold">
+                                        <span class="material-symbols-outlined">error</span>
+                                        This task is locked until "{{ task.depends_on.title }}" is completed.
+                                    </small>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                            <hr>
+                            <div class="d-flex flex-wrap justify-content-center gap-4 mb-4" >
+                                <div class="d-flex align-items-center justify-content-center text-danger gap-1" style="cursor: pointer;" title="delete task" onclick="delete_task(event, '{{task.id}}')" >
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                                    delete</span>
+                                    <small>Delete</small>
+                                </div>
+                                {% if task.status == 'in_progress' %}
+                                    <div class="d-flex align-items-center justify-content-center text-success gap-1" style="cursor: pointer;" title="complete task" onclick="complete_task(event, '{{task.id}}')">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">
+                                        done_outline</span>
+                                        <small>Complete</small>
+                                    </div>
+                                {% endif %}
+                                {% if not task.status == 'completed' %}
+                                    <a href="{% url 'edit_task' task.id %}" class="d-flex align-items-center justify-content-center text-decoration-none text-primary gap-1" style="cursor: pointer;" title="edit task">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">
+                                        edit</span>
+                                        <small>Edit</small>
+                                    </a>
+                                {% endif %}
+                            </div>
+                            {% if task.is_unlocked and task.status == 'in_progress' %}
+                            <div class="d-flex flex-wrap justify-content-center gap-4" style="margin-bottom: -20px !important;">
+                                <div class="d-flex align-items-center justify-content-center text-white fw-bold gap-1 p-1 px-2" 
+                                {% if not task.timer_started_at %}
+                                    style="cursor: pointer; border-radius: 20px; background-color: rgb(132, 198, 33);"
+                                {%else%}
+                                    style="cursor: pointer; border-radius: 20px; background-color: green;" 
+                                {%endif%} 
+                                title="start timer" onclick="start_stop_clock(event, '{{task.id}}')" id="clock-div-{{task.id}}">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;" id="clock-symbol-{{task.id}}">{% if not task.timer_started_at %}not_started{% else %}pause{% endif %}
+                                    </span>
+                                    <small id="clock-name-{{task.id}}">
+                                        {% if not task.timer_started_at %}Start Timer
+                                        {% else %}Stop Timer
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <small>No tasks are currently in progress.</small>
+                    {% endif %}
+                </div>
+                <div class="mt-5" id="ongoing_tasks">
+                    <div class="task-list-head"><h5>Ongoing Tasks</h5></div>
+                    <hr>
+                    {% if ongoing_tasks %}
+                    <div class="d-lg-flex gap-4 flex-wrap justify-content-center mt-4">
+                        {% for task in ongoing_tasks %}
+                        <div class="task-info-card {% if not task.is_unlocked %} locked {% endif %}">
+                            <p class="p-1 px-2 rounded fw-bold">{{task.title}}</p>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                {% if task.priority == 'high' %}
+                                <p><small class="bg-danger text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'medium' %}
+                                <p><small class="bg-warning text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'low' %}
+                                <p><small class="bg-success text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% endif %}
+                                <p>
+                                <small class="d-flex gap-1 align-items-center">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    <span id="time-spent-{{task.id}}">{{task.time_spent|format_duration}}</span>
+                                </small></p>
+                            </div>
+                            <div class="project-info-status d-flex align-items-center justify-content-between gap-5">
+                                <div class="d-flex gap-1 align-items-center text-primary" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined">sync</span>
+                                    <small class="fw-bold">{{task.formatted_task_status}}</small>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined fw-bold">schedule</span>
+                                    <small>{{task.deadline}}</small>
+                                </div>
+                            </div>
+                            {% if task.depends_on %}
+                                {% if not task.is_unlocked %}
+                                <div class="mt-2">
+                                    <small class="warning d-flex gap-1 text-danger opacity-75 fw-bold">
+                                        <span class="material-symbols-outlined">error</span>
+                                        This task is locked until "{{ task.depends_on.title }}" is completed.
+                                    </small>
+                                </div>
+                                {% endif %}
+                            {% endif %}
+                            <hr>
+                            <div class="d-flex flex-wrap justify-content-center gap-4 mb-4" >
+                                <div class="d-flex align-items-center justify-content-center text-danger gap-1" style="cursor: pointer;" title="delete task" onclick="delete_task(event, '{{task.id}}')" >
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                                    delete</span>
+                                    <small>Delete</small>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center text-success gap-1" style="cursor: pointer;" title="complete task" onclick="complete_task(event, '{{task.id}}')">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                                    done_outline</span>
+                                    <small>Complete</small>
+                                </div>
+                                <a href="{% url 'edit_task' task.id %}" class="d-flex align-items-center justify-content-center text-decoration-none text-primary gap-1" style="cursor: pointer;" title="edit task">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                                    edit</span>
+                                    <small>Edit</small>
+                                </a>
+                            </div>
+                            {% if task.is_unlocked %}
+                            <div class="d-flex flex-wrap justify-content-center gap-4" style="margin-bottom: -20px !important;">
+                                <div class="d-flex align-items-center justify-content-center text-white fw-bold gap-1 p-1 px-2" 
+                                {% if not task.timer_started_at %}
+                                    style="cursor: pointer; border-radius: 20px; background-color: rgb(132, 198, 33);"
+                                {% else %}
+                                    style="cursor: pointer; border-radius: 20px; background-color: green;" 
+                                {% endif %} 
+                                title="start/stop timer" onclick="start_stop_clock(event, '{{task.id}}')" id="clock-div-{{task.id}}">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;" id="clock-symbol-{{task.id}}">{% if not task.timer_started_at %}not_started{% else %}pause{% endif %}
+                                    </span>
+                                    <small id="clock-name-{{task.id}}">
+                                        {% if not task.timer_started_at %}Start Timer
+                                        {% else %}Stop Timer
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <small>No tasks are currently in progress.</small>
+                    {% endif %}
+                </div>
+                <div class="mt-5" id="completed_tasks">
+                    <div class="task-list-head"><h5>Completed Tasks</h5></div>
+                    <hr>
+                    {% if completed_tasks %}
+                    <div class="d-lg-flex gap-4 flex-wrap justify-content-center mt-4">
+                        {% for task in completed_tasks %}
+                        <div class="task-info-card">
+                            <p class="p-1 px-2 rounded fw-bold">{{task.title}}</p>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                {% if task.priority == 'high' %}
+                                <p><small class="bg-danger text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'medium' %}
+                                <p><small class="bg-warning text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'low' %}
+                                <p><small class="bg-success text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% endif %}
+                                <p>
+                                <small class="d-flex gap-1 align-items-center">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    <span id="{{task.id}}-time-spent">{{task.time_spent|format_duration}}</span>
+                                </small></p>
+                            </div>
+                            <div class="project-info-status d-flex align-items-center justify-content-between gap-5">
+                                <div class="d-flex gap-1 align-items-center text-success" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                    <small class="fw-bold">{{task.formatted_task_status}}</small>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined fw-bold">schedule</span>
+                                    <small>{{task.deadline}}</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex align-items-center text-danger w-50 justify-content-center m-auto gap-1" style="margin-bottom: -20px !important; cursor: pointer;" title="delete task" onclick="delete_task(event, '{{task.id}}')" >
+                                <span class="material-symbols-outlined" style="font-size: 20px;">
+                                delete</span>
+                                <small>Delete</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <small>No completed tasks.</small>
+                    {% endif %}
+                </div>
+                <div class="mt-5" id="overdue_tasks">
+                    <div class="task-list-head">
+                        <h5 class="d-inline">Overdue Tasks</h5>
+                        <small>( You need to extend the deadline of overdue tasks for enabling the complete button )</small>
+                    </div>
+                    <hr>
+                    {% if overdue_tasks %}
+                    <div class="d-lg-flex gap-4 flex-wrap justify-content-center mt-4">
+                        {% for task in overdue_tasks %}
+                        <div class="task-info-card">
+                            <p class="p-1 px-2 rounded fw-bold">{{task.title}}</p>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                {% if task.priority == 'high' %}
+                                <p><small class="bg-danger text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'medium' %}
+                                <p><small class="bg-warning text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% elif task.priority == 'low' %}
+                                <p><small class="bg-success text-white p-1 px-2 rounded-5 fw-bold" style="font-size: 12px;">{{ task.priority|title }}</small></p>
+                                {% endif %}
+                                <p>
+                                <small class="d-flex gap-1 align-items-center">
+                                    <span class="material-symbols-outlined">timer</span>
+                                    <span id="{{task.id}}-time-spent">{{task.time_spent|format_duration}}</span>
+                                </small></p>
+                            </div>
+                            <div class="project-info-status d-flex align-items-center justify-content-between gap-5">
+                                <div class="d-flex gap-1 align-items-center text-danger" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined">report</span>
+                                    <small class="fw-bold">{{task.formatted_task_status}}</small>
+                                </div>
+                                <div class="d-flex gap-1 align-items-center" style="border-radius: 20px;">
+                                    <span class="material-symbols-outlined fw-bold">schedule</span>
+                                    <small>{{task.deadline}}</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between" style="margin-bottom: -20px !important;">
+                                <div class="d-flex align-items-center text-danger justify-content-center gap-1" style="cursor: pointer; width: 40%;" title="delete task" onclick="delete_task(event, '{{task.id}}')">
+                                    <span class="material-symbols-outlined"  style="font-size: 20px;">
+                                    delete</span>
+                                    <small>Delete</small>
+                                </div>
+                                <a href="{% url 'edit_task' task.id %}" class="d-flex align-items-center text-primary justify-content-center text-decoration-none gap-1" style="cursor: pointer; width: 40%;" title="delete task">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                                    edit</span>
+                                    <small>Edit</small>
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <small>No overdue tasks.</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
