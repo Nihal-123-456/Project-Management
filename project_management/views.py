@@ -203,11 +203,11 @@ def CreateTaskView(request, project_id):
                     messages.warning(request, f"The task's deadline cannot be earlier than the deadline of the task it depends on which is at {dependency_task.deadline}.")
                     return redirect('create_task', project_id=project_id)
                 Task.objects.create(project=project, title=title, deadline=deadline, priority=priority, status='in_progress', depends_on=dependency_task)
-                return redirect(f'{reverse('project_detail', args=[project_id])}#task-lists')
+                return redirect(f"{reverse('project_detail', args=[project_id])}#task-lists")
             
             Task.objects.create(project=project, title=title, deadline=deadline, priority=priority, status='in_progress')
 
-            return redirect(f'{reverse('project_detail', args=[project_id])}#task-lists')
+            return redirect(f"{reverse('project_detail', args=[project_id])}#task-lists")
         
         else:
             return render(request, 'create_task.html', {'ongoing_tasks': Task.objects.filter(project=project, status='in_progress')})
