@@ -1,0 +1,320 @@
+body {
+    background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.9)),
+    url(https://cdn.pixabay.com/photo/2020/10/12/16/45/pattern-5649403_960_720.jpg);
+    background-size: cover;
+    background-position: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.message {
+    width: 30%;
+    margin: auto;
+    margin-bottom: -100px;
+    padding: 10px;
+}
+.message.success {color: green; border: 1px solid green;}
+.message.error { color: red; border: 1px solid red;}
+.message.info { color: blue; border: 1px solid blue;}
+.message.warning { color: orange; border: 1px solid orange;}
+/* Index page */
+.hero-section {
+    background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.5)),
+    url(https://cdn.pixabay.com/photo/2018/05/28/06/00/whitespace-3435350_960_720.jpg);
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 30px !important;
+    width: 75%;
+}
+.hero-section p {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+.btn-custom-index {
+    background-color: #39A2F7;
+    color: #000;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    border-radius: 35px;
+}
+.btn-custom-index:hover {
+    background-color: #006ac2;
+}
+.features-section {
+    background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.5)),
+    url(https://cdn.pixabay.com/photo/2017/02/15/11/05/texture-2068283_1280.jpg);
+    background-size: cover;
+    background-position: center;
+    padding: 120px 0;
+}
+.features-section h2{
+    margin-bottom: 70px;
+}
+.features-section-2 {
+    background-image: url("https://cdn.pixabay.com/photo/2017/09/03/06/12/abstract-2709402_1280.png");
+    background-size: cover;
+    background-position: center;
+    padding: 90px 0;
+    color: white;
+}
+.features-section-2 h1{
+    margin-bottom: 90px;
+}
+/* Footer */
+footer{
+    background-color: #f8fafc;
+    width: 100%;
+    margin: auto;
+    margin-top: 20vh;
+    padding: 50px 70px;
+}
+#section-1{
+    width: 30%;
+}
+#section-2, #section-3, #section-4 {
+    width: 20%;
+}
+/* Navbar */
+.navbar {
+    background-color: white; 
+    position: fixed;
+    width: 90%;
+    top: 30px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 35px;
+    padding: 10px;
+    z-index: 100;
+}
+.navbar-brand {
+    color: black;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+.navbar-brand:hover {
+    color: rgb(112, 112, 112);
+}
+.navbar-nav .nav-link {
+    color: rgb(112, 112, 112);
+    margin-right: 15px;
+    font-weight: bold;
+}
+.navbar-nav .nav-link:hover {
+    color: #ffc107;
+}
+.navbar-toggler {
+    border: none;
+}
+.navbar-toggler-icon {
+    background-image: url('https://img.icons8.com/ios-filled/50/000000/menu.png');
+}
+.btn-custom-nav {
+    background-color: #ffc107;
+    color: #000;
+    border-radius: 35px;
+}
+.btn-custom-nav:hover {
+    background-color: #e0a800;
+}
+/* Register page */
+#registration-container{
+    width: 75%;
+    min-width: 330px;
+    margin: 200px auto;
+    padding: 100px 50px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+.form-control:focus {
+    box-shadow: none;
+    border-color: #007bff;
+}
+.btn-custom-blue {
+    background-color: #3146C5;
+    color: #fff;
+    width: 100%;
+}
+.btn-custom-blue:hover {
+    color: white;
+    background-color: #4a5dc4;
+}
+.form-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+/* Login page */
+.login-container {
+    width: 70%;
+    min-width: 330px;
+    margin: 200px auto;
+    padding: 100px 50px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+#login-img,#login-form,.registration-form,.registration-img, #edit-task-img, #edit-task-form{
+    width: 50%;
+}
+#login-form,.registration-form, #edit-task-form{
+    background-color: rgb(252, 252, 252);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+}
+.login-container h3 {
+    text-align: center;
+    font-weight:bolder;
+}
+.sign-up-link a {
+    color: #007bff;
+}
+/* Dashboard */
+.dashboard-container {
+    width: 70%;
+    margin-top: 150px;
+}
+.dashboard-navigation{
+    position: fixed;
+    width: 20%;
+    top: 150px;
+    background-color: #4C3575;
+    padding: 40px 20px;
+    border-radius: 20px;
+    height: 70vh;
+}
+.dashboard-navigation li{
+    margin-bottom: 15px;
+}
+.dashboard-navigation li:hover{
+    color: #E05170;
+}
+.stats {
+    margin-bottom: 20px;
+}
+.stats div {
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.project-list-container {
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+.project-info-card{
+    background-color: white;
+    width: 46%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 20px 40px 20px;
+}
+.project-actions{
+    border: 1px solid gray;
+    border-radius: 20px;
+}
+.project-actions span{
+    font-size: 20px;
+}
+.project-info-status span{
+    font-size: 18px;
+}
+/* Project Detail */
+.project-details-section{
+    margin-top: 150px;
+}
+.task-info-card{
+    background-color: white;
+    width: 31%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 20px 40px 20px;
+    margin-bottom: 15px;
+}
+.locked{
+    background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.9)),
+    url(https://cdn.pixabay.com/photo/2013/07/12/18/03/lock-152879_1280.png);
+    background-size:contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.task-select-btns{
+    border: 1px solid rgb(83, 83, 83);
+    border-radius: 20px;
+    width: fit-content;
+}
+.task-select-btns button{
+    background-color: white;
+}
+
+@media (max-width: 991px) {
+    .message {
+        width: 60%;
+    }
+    #dashboard-section, .project-container, .edit-project-container {
+        margin: auto;
+        width: 95%;
+    }
+    .stats div {
+        width: 100%;
+    }
+    .hero-section{
+        margin-top: 70px;
+    }
+    .hero-section h1 {
+        width: 100%;
+    }
+    .features-section, .features-section-2 {
+        padding: 60px 0;
+    }
+    .features-section h2, .features-section-2 h1{
+        margin-bottom: 50px;
+    }
+    footer{
+        background-color: inherit;
+        width: 90%;
+        margin: auto;
+        margin-top: 10vh;
+        margin-bottom: 10vh;
+        padding: 0;
+    }
+    .login-container,#registration-container {
+        padding: 60px 30px;
+    }
+    #login-img,#login-form,.registration-form,.registration-img,#edit-task-img,#edit-task-form{
+        width: 100%;
+    }
+    #login-form,.registration-form,#edit-task-form{
+        margin-top: 60px;
+        background-color: inherit;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 0;
+    }
+    .dashboard-container {
+        width: 100%;
+    }
+    .dashboard-navigation {
+        display: none;
+    }
+    .stats div {
+        margin-bottom: 10px;
+    }
+    .project-info-card, .task-info-card{
+        width: 90%;
+        margin: auto;
+        margin-bottom: 20px;
+    }
+    .task-list-head{
+        height: auto;
+    }
+}
